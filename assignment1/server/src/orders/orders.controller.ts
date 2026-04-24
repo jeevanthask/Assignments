@@ -6,7 +6,6 @@ class CreateOrderDTO {
   quantity: number;
   totalAmount: number;
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
-  createdAt: string;
 }
 
 @Controller('orders')
