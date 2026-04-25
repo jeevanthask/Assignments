@@ -6,7 +6,7 @@ export class CreateOrderDTO {
   userId: number;
 
   @IsString()
-  productNamee: string;
+  productName: string;
 
   @IsInt()
   quantity: number;
