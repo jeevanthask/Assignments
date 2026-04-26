@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { OrdersModule } from './orders/orders.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from './orders/entities/order.entity';
+import { KafkaModule } from './kafka/kafka.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Order } from './orders/entities/order.entity';
       entities: [Order],
       synchronize: true,
     }),
+    KafkaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
