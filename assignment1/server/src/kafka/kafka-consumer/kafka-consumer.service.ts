@@ -4,6 +4,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { Kafka } from 'kafkajs';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class KafkaConsumerService
@@ -14,6 +15,8 @@ export class KafkaConsumerService
     brokers: ['localhost:9092'],
   });
   private readonly consumer = this.kafka.consumer({ groupId: 'my-group' });
+
+  constructor(private readonly notificationService: NotificationService) {}
 
   async onModuleInit() {
     await this.consumer.connect();
@@ -29,7 +32,11 @@ export class KafkaConsumerService
           `[${topic}]: Partition: ${partition} - Message: ${payload}`,
         );
 
-        // Add your business logic here to process the message
+        if (topic === 'orders.created') {
+          await this.notificationService.handleOrderCreatedNotification(
+            JSON.parse(payload!),
+          );
+        }
       },
     });
   }
