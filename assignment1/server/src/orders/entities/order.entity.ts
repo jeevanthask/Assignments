@@ -20,7 +20,7 @@ export class Order {
   @Column()
   quantity: number;
 
-  @Column({ name: 'total_amount' })
+  @Column({ name: 'total_amount', type: 'decimal', precision: 10, scale: 2 })
   totalAmount: number;
 
   @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.pending })
