@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsPositive, IsString } from 'class-validator';
 import { OrderStatus } from '../enums/orderStatus.enum';
 
 export class CreateOrderDTO {
@@ -11,7 +11,8 @@ export class CreateOrderDTO {
   @IsInt()
   quantity: number;
 
-  @IsInt()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsPositive()
   totalAmount: number;
 
   @IsEnum(OrderStatus)

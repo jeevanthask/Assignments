@@ -23,19 +23,24 @@ export class KafkaConsumerService
     console.log('Kafka consumer connected');
     await this.consumer.subscribe({
       topic: 'orders.created',
-      fromBeginning: true,
+      fromBeginning: false,
     });
     await this.consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
-        const payload = message.value ? message.value.toString() : null;
-        console.log(
-          `[${topic}]: Partition: ${partition} - Message: ${payload}`,
-        );
-
-        if (topic === 'orders.created') {
-          await this.notificationService.handleOrderCreatedNotification(
-            JSON.parse(payload!),
+        try {
+          const payload = message.value ? message.value.toString() : null;
+          console.log(
+            `[${topic}]: Partition: ${partition} - Message: ${payload}`,
           );
+
+          if (topic === 'orders.created') {
+            await this.notificationService.handleOrderCreatedNotification(
+              JSON.parse(payload!),
+            );
+          }
+        } catch (error) {
+          console.log('error occured');
+          throw error;
         }
       },
     });

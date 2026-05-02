@@ -29,7 +29,7 @@ import * as path from 'path';
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DATABASE'),
         entities: [Order],
-        synchronize: true,
+        synchronize: false,
       }),
     }),
     KafkaModule,
