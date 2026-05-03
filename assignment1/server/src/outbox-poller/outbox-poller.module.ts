@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([OutboxPoller])],
   controllers: [OutboxPollerController],
   providers: [OutboxPollerService],
+  exports: [OutboxPollerService],
 })
 export class OutboxPollerModule {}
