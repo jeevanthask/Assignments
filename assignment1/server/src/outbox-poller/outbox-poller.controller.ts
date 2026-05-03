@@ -7,6 +7,6 @@ export class OutboxPollerController {
 
   @Post('create-outbox')
   async createOutBox(@Body() createOutBoxDTO: any): Promise<any> {
-    return this.outboxService.createOutBox(createOutBoxDTO);
+    // return this.outboxService.createOutBox(createOutBoxDTO);
   }
 }
