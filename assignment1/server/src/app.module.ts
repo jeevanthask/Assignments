@@ -9,7 +9,9 @@ import { NotificationModule } from './notification/notification.module';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule } from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
+import { OutboxPollerModule } from './outbox-poller/outbox-poller.module';
 import * as path from 'path';
+import { OutboxPoller } from './outbox-poller/entities/outbox.entity';
 
 @Module({
   imports: [
@@ -28,8 +30,8 @@ import * as path from 'path';
         username: config.get<string>('DB_USERNAME'),
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DATABASE'),
-        entities: [Order],
-        synchronize: false,
+        entities: [Order, OutboxPoller],
+        synchronize: true,
       }),
     }),
     KafkaModule,
@@ -43,6 +45,7 @@ import * as path from 'path';
         },
       }),
     }),
+    OutboxPollerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
