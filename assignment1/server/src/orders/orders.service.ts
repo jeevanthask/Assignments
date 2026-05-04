@@ -22,7 +22,7 @@ export class OrdersService {
     // );
 
     return this.dataSource.transaction(async (manager) => {
-      const orderCreated = await this.orderRepository.save(order);
+      const orderCreated = await manager.getRepository(Order).save(order);
       console.log(
         'order created-----------------------------------------------',
       );

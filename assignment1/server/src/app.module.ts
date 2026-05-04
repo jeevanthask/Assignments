@@ -12,9 +12,11 @@ import { ConfigService } from '@nestjs/config';
 import { OutboxPollerModule } from './outbox-poller/outbox-poller.module';
 import * as path from 'path';
 import { OutboxPoller } from './outbox-poller/entities/outbox.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: path.resolve(process.cwd(), '.env'),
