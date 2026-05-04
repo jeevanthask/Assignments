@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OutboxPoller } from './entities/outbox.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { Cron, Interval } from '@nestjs/schedule';
+import { KafkaConsumerService } from 'src/kafka/kafka-consumer/kafka-consumer.service';
+import { KafkaProducerService } from 'src/kafka/kafka-producer/kafka-producer.service';
 
 @Injectable()
 export class OutboxPollerService {
   constructor(
     @InjectRepository(OutboxPoller)
     private outboxRepository: Repository<OutboxPoller>,
+    private kafkaProducerService: KafkaProducerService,
   ) {}
 
   async createOutBox(
@@ -24,7 +27,7 @@ export class OutboxPollerService {
     return repo.save(createOutBoxDTO);
   }
 
-  @Interval(5000)
+  @Interval(10000)
   async handleOutboxEvent(): Promise<any> {
     console.log('cron job for outbox service started-------------');
     const pendingOutboxes = await this.outboxRepository.find({
@@ -32,5 +35,10 @@ export class OutboxPollerService {
     });
 
     console.log(pendingOutboxes);
+
+    await this.kafkaProducerService.sendMessage(
+      'orders.created',
+      JSON.stringify(pendingOutboxes[0]),
+    );
   }
 }
