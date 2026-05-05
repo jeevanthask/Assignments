@@ -3,7 +3,7 @@ import {
   OnApplicationShutdown,
   OnModuleInit,
 } from '@nestjs/common';
-import { Kafka } from 'kafkajs';
+import { Kafka, Producer } from 'kafkajs';
 
 @Injectable()
 export class KafkaProducerService
@@ -14,12 +14,17 @@ export class KafkaProducerService
     brokers: ['localhost:9092'],
   });
 
-  private readonly producer = this.kafka.producer();
+  private producer: Producer;
 
   async onModuleInit() {
-    await this.producer.connect();
+    this.producer = this.kafka.producer({
+      idempotent: true,
+      maxInFlightRequests: 5,
+      transactionTimeout: 30000,
+    });
     console.log('Kafka producer connected');
   }
+
   async onApplicationShutdown() {
     await this.producer.disconnect();
     console.log('Kafka producer disconnected');
@@ -36,5 +41,32 @@ export class KafkaProducerService
       console.error('Error sending message:', error);
       throw error;
     }
+  }
+
+  async sendToRetry(params: {
+    retryTopic: string;
+    originalTopic: string;
+    key: any;
+    value: any;
+    headers: any;
+    attempt: number;
+    delayMs: number;
+    error: Error;
+  }): Promise<any> {
+    try {
+      return await this.producer.send({
+        topic: params.retryTopic,
+        messages: [
+          {
+            key: params.key,
+            value: params.value,
+            headers: {
+              ...params.headers,
+            },
+          },
+        ],
+        acks: 1,
+      });
+    } catch (error) {}
   }
 }
