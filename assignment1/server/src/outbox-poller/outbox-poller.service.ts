@@ -29,16 +29,38 @@ export class OutboxPollerService {
 
   @Interval(10000)
   async handleOutboxEvent(): Promise<any> {
+    let kafkaResponse: any;
+
     console.log('cron job for outbox service started-------------');
     const pendingOutboxes = await this.outboxRepository.find({
       where: { status: 'PENDING' },
     });
 
+    console.log('pending outboxes------------------');
     console.log(pendingOutboxes);
 
-    await this.kafkaProducerService.sendMessage(
-      'orders.created',
-      JSON.stringify(pendingOutboxes[0]),
-    );
+    if (pendingOutboxes.length) {
+      kafkaResponse = await this.kafkaProducerService.sendMessage(
+        'orders.created',
+        JSON.stringify(pendingOutboxes[0]),
+      );
+
+      console.log('kafka response---------------------------');
+      console.log(kafkaResponse);
+    }
+
+    if (kafkaResponse) {
+      const updateStatus = await this.outboxRepository
+        .createQueryBuilder()
+        .update(OutboxPoller)
+        .set({ status: 'CONFIRMED' })
+        .where('status = :status', { status: 'PENDING' })
+        .execute();
+
+      console.log('status updated-----------');
+      console.log(updateStatus);
+    }
+
+    console.log('end of kafka response--------------------');
   }
 }

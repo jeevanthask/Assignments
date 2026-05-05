@@ -25,13 +25,13 @@ export class KafkaProducerService
     console.log('Kafka producer disconnected');
   }
 
-  async sendMessage(topic: string, message: string): Promise<void> {
+  async sendMessage(topic: string, message: string): Promise<any> {
     try {
-      await this.producer.send({
+      return await this.producer.send({
         topic,
         messages: [{ value: message }],
+        acks: 1,
       });
-      console.log(`Message sent to topic ${topic}: ${message}`);
     } catch (error) {
       console.error('Error sending message:', error);
       throw error;
